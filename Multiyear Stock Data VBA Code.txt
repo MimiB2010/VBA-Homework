@@ -1,0 +1,70 @@
+Sub StockVolume()
+
+Dim year As Worksheet
+For Each year In Worksheets
+    'MsgBox year.Name
+
+    Dim column As Integer
+    Dim stock_vol As Double
+    Dim summary_ticker As Integer
+    Dim change_value As Double
+    Dim lrow As Double
+    Dim i As Double
+    Dim year_change As Double
+    Dim percent_change As Double
+
+    column = 1
+    stock_vol = 0
+    summary_ticker = 2
+    change_value = 2
+
+    year.Range("I1").Value = "Ticker"
+    year.Range("J1").Value = "Yearly Change"
+    year.Range("K1").Value = "Percent Change"
+    year.Range("L1").Value = "Total Stock Value"
+
+    lrow = year.Range("A1", year.Range("A1").End(xlDown)).Rows.Count
+        'MsgBox lrow
+
+        For i = 2 To lrow
+            If year.Cells(i, column).Value <> year.Cells(i + 1, column).Value Then
+                stock_vol = stock_vol + year.Cells(i, 7).Value
+                year_change = year.Cells(i, 6).Value - year.Cells(change_value, 3).Value
+                    'MsgBox year_change
+                
+                year.Cells(summary_ticker, 9).Value = year.Cells(i, column).Value
+                year.Cells(summary_ticker, 10).NumberFormat = "0.000000000"
+                year.Cells(summary_ticker, 10).Value = year_change
+                    If year_change < 0 Then
+                        year.Cells(summary_ticker, 10).Interior.ColorIndex = 3
+                    Else
+                        year.Cells(summary_ticker, 10).Interior.ColorIndex = 4
+                    End If
+
+                year.Cells(summary_ticker, 11).NumberFormat = "0.00%"
+                    If year.Cells(change_value, 3).Value <> 0 Then
+                        percent_change = year_change / year.Cells(change_value, 3).Value
+                           'MsgBox percent_change
+                        year.Cells(summary_ticker, 11).Value = percent_change
+                    Else
+                        year.Cells(summary_ticker, 11).Value = "No Percent Change"
+                    End If
+
+                year.Cells(summary_ticker, 12).Value = stock_vol
+
+                year.Columns("I:L").EntireColumn.AutoFit
+
+                'reset this amount to get correct stock volume total for next ticker
+                stock_vol = 0
+                'print the next ticker in list on the next row
+                summary_ticker = summary_ticker + 1
+                'select the next tickers "open value" on the first day
+                change_value = i + 1
+            Else
+                stock_vol = stock_vol + year.Cells(i, 7).Value
+            End If
+        Next i
+Next year
+
+End Sub
+
